@@ -22,9 +22,6 @@ public class MqttConfig {
     @Value("${running.mode}")
     private String runningMode;
 
-    //@Autowired
-    //private DeviceMessageProcessor deviceMessageProcessor;
-
     @Autowired
     private Environment environment;
 
@@ -62,7 +59,7 @@ public class MqttConfig {
                 if(iMqttClient.connectWithResult(options).getClient().isConnected())
                 {
                     System.out.println("MQTT is connected");
-                    //setTopic(iMqttClient);
+
                 }
             }
 
@@ -73,35 +70,5 @@ public class MqttConfig {
         return iMqttClient;
     }
 
-//    private void setTopic(IMqttClient iMqttClient) throws MqttException {
-//
-//        Map<String, MqttMessageProcessor> dispatchMap = new HashMap<>();
-//        dispatchMap.put(DEVICE_RECEIVE_TOPIC, deviceMessageProcessor);
-//
-//        iMqttClient.subscribe(DEVICE_RECEIVE_TOPIC);
-//
-//        iMqttClient.setCallback(new MqttCallback() {
-//
-//            public void messageArrived(String topic, MqttMessage message) throws Exception {
-//
-//                System.out.println("Message Arrived" );
-//                System.out.println("Topic: " + topic );
-//                System.out.println("Message: " + new String(message.getPayload()));
-//                System.out.println("QoS: " + message.getQos());
-//
-//                dispatchMap.get(topic).processMessage(topic, message);
-//            }
-//
-//            public void connectionLost(Throwable cause) {
-//
-//                System.out.println("MQTT connection is disconnected. " + cause.getMessage());
-//
-//            }
-//
-//            public void deliveryComplete(IMqttDeliveryToken token) {
-//            }
-//
-//        });
-//
-//    }
+
 }

@@ -100,33 +100,20 @@ public class CameraController extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                try {
-                    System.exit(0);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
+        primaryStage.setOnCloseRequest((event -> {
+            System.exit(0);
+        }));
     }
 
     private void initButtonAction(Button sendMessageButton)
     {
-        sendMessageButton.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-
-                try {
-                    deviceMessageProcessor.publishMessage();
-                } catch (MqttException e) {
-                    throw new RuntimeException(e);
-                }
-
+        sendMessageButton.setOnAction((event -> {
+            try {
+                deviceMessageProcessor.publishMessage();
+            } catch (MqttException e) {
+                System.out.println("Message cannot be sent. The exception is: " + e.getMessage());
             }
-        });
+        }));
     }
 
 
