@@ -39,4 +39,19 @@ public class DeviceMessageProcessor implements MqttMessageProcessor{
         System.out.println("Message "+ message +" is sent to '/device/receive'");
 
     }
+
+
+    @Async
+    public void publishObjectDetectedMessage() throws MqttException {
+
+        Camera camera = new Camera(cameraConfigurator.cameraSource,"camera","object detected");
+        MqttMessage message = new MqttMessage();
+        message.setQos(0);
+        message.setPayload(JsonParser.getInstance().serializeJson(camera).getBytes());
+        iMqttClient.publish(DEVICE_RECEIVE_TOPIC, message);
+
+        System.out.println("Object is detected !");
+        System.out.println("Message "+ message +" is sent to '/device/receive'");
+
+    }
 }

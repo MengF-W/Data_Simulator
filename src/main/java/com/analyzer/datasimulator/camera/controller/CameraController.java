@@ -1,5 +1,6 @@
 package com.analyzer.datasimulator.camera.controller;
 
+import com.analyzer.datasimulator.camera.utility.ObjectDetection;
 import com.analyzer.datasimulator.messenger.processor.DeviceMessageProcessor;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -17,7 +18,11 @@ import javafx.stage.WindowEvent;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
+import org.opencv.core.Core;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.video.BackgroundSubtractorMOG2;
+import org.opencv.video.Video;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +30,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 @Component
 public class CameraController extends Application {
@@ -38,6 +47,9 @@ public class CameraController extends Application {
 
     @Autowired
     DeviceMessageProcessor deviceMessageProcessor;
+
+    @Autowired
+    ObjectDetection objectDetection;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -62,12 +74,12 @@ public class CameraController extends Application {
         scene = new Scene(vBox, videoCapture.get(Videoio.CAP_PROP_FRAME_WIDTH)+30, videoCapture.get(Videoio.CAP_PROP_FRAME_HEIGHT)+85);
     }
 
-    private void streamCamera(){
+    private void streamCamera() throws MqttException{
 
         if (videoCapture.isOpened()){
 
             System.out.println("Camera is connected");
-
+            BackgroundSubtractorMOG2 mog2 = Video.createBackgroundSubtractorMOG2(500,16,true);
             new AnimationTimer() {
                 @Override public void handle(long l) {
 
@@ -75,6 +87,14 @@ public class CameraController extends Application {
 
                         Mat mat = new Mat();
                         videoCapture.read(mat);
+
+                        try {
+                        Mat foreGroundMask = objectDetection.processFrame(mat,mog2);
+                        objectDetection.detectObject(foreGroundMask,mat);
+                        } catch (MqttException e) {
+                            System.out.println("Message cannot be sent. The exception is: " + e.getMessage());
+                        }
+
                         imageView.setImage(convertImgDimensionArrayToViewableImg(mat));
                     }
                     else
