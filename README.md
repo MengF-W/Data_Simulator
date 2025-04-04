@@ -26,3 +26,9 @@ The data simulator application act as a message publisher simulator. Currently t
 
 ![image](https://github.com/user-attachments/assets/ac7a8438-50d4-4a5d-8fbd-7c825a237579)
 
+# Object Detection
+![detected](https://github.com/user-attachments/assets/72778681-ed9b-413a-b025-73c9b56e2f22)  
+-The web cam is able to detect a moving object.
+
+# Example of Detected Object Message Sent
+![detected2](https://github.com/user-attachments/assets/a208b6f7-dcce-4d0b-85ab-0280af0cabec) - A message will be triggered and send to MQTT server
