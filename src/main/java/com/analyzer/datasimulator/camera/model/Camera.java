@@ -1,11 +1,14 @@
 package com.analyzer.datasimulator.camera.model;
 
 
+import java.time.LocalDateTime;
+
 public class Camera {
-    public Camera(String name, String deviceType, String messageContent) {
+    public Camera(String name, String deviceType, String messageContent, LocalDateTime timeStamp) {
         this.name = name;
         this.deviceType = deviceType;
         this.messageContent = messageContent;
+        this.timeStamp = timeStamp;
     }
 
 
@@ -13,6 +16,8 @@ public class Camera {
     private String deviceType;
 
     private String messageContent;
+
+    private LocalDateTime timeStamp;
 
     public String getName() {
         return name;
