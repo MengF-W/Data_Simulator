@@ -14,6 +14,10 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Component
 public class DeviceMessageProcessor implements MqttMessageProcessor{
 
@@ -31,7 +35,7 @@ public class DeviceMessageProcessor implements MqttMessageProcessor{
     @Async
     public void publishMessage() throws MqttException {
 
-        Camera camera = new Camera(cameraConfigurator.cameraSource,"camera","Camera Message Content");
+        Camera camera = new Camera(cameraConfigurator.cameraSource,"camera","Camera Message Content", LocalDateTime.now());
         MqttMessage message = new MqttMessage();
         message.setPayload(JsonParser.getInstance().serializeJson(camera).getBytes());
         iMqttClient.publish(DEVICE_RECEIVE_TOPIC, message);
@@ -44,7 +48,7 @@ public class DeviceMessageProcessor implements MqttMessageProcessor{
     @Async
     public void publishObjectDetectedMessage() throws MqttException {
 
-        Camera camera = new Camera(cameraConfigurator.cameraSource,"camera","object detected");
+        Camera camera = new Camera(cameraConfigurator.cameraSource,"camera","object detected",LocalDateTime.now());
         MqttMessage message = new MqttMessage();
         message.setQos(0);
         message.setPayload(JsonParser.getInstance().serializeJson(camera).getBytes());
