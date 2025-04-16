@@ -1,6 +1,6 @@
 # Overall Idea
 
-![Capture](https://github.com/user-attachments/assets/33a949ff-15b5-48bb-86c8-8a5a45409f8d)
+![image](https://github.com/user-attachments/assets/9bde98a4-4076-417e-a573-c4e66da02955)
 The idea is to monitor and analsyt MQTT enabled devices by collect messages and feed into data pipeline
 
 
