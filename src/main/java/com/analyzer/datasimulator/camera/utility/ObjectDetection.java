@@ -3,6 +3,7 @@ package com.analyzer.datasimulator.camera.utility;
 import com.analyzer.datasimulator.messenger.processor.DeviceMessageProcessor;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.opencv.core.*;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG2;
 import org.opencv.video.Video;
@@ -58,7 +59,6 @@ public class ObjectDetection {
 
         if(!contours.isEmpty())
         {
-            deviceMessageProcessor.publishObjectDetectedMessage();
 
             for(int index = 0; index < contours.size(); index++)
             {
@@ -79,6 +79,11 @@ public class ObjectDetection {
                             new Scalar(0, 255, 0), 2);
                 }
             }
+
+            MatOfByte matOfByte = new MatOfByte();
+            Imgcodecs.imencode(".jpg", videoFrame, matOfByte);
+            deviceMessageProcessor.publishObjectDetectedMessage(matOfByte.toArray());
+
 
         }
 
