@@ -2,6 +2,7 @@ package com.analyzer.datasimulator.messenger.configuration;
 
 
 import org.eclipse.paho.client.mqttv3.*;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +26,6 @@ public class MqttConfig {
     @Autowired
     private Environment environment;
 
-
     @Bean
     public IMqttClient initMqttClient() {
 
@@ -47,7 +47,15 @@ public class MqttConfig {
         IMqttClient iMqttClient = null;
 
         try {
-            iMqttClient = new MqttClient(MQTT_SERVER_ADDRES, MQTT_PUBLISHER_ID);
+            if(Boolean.parseBoolean(environment.getProperty("mqtt.filePersistence")))
+            {
+                iMqttClient = new MqttClient(MQTT_SERVER_ADDRES, MQTT_PUBLISHER_ID);
+            }
+            else
+            {
+
+                iMqttClient = new MqttClient(MQTT_SERVER_ADDRES, MQTT_PUBLISHER_ID,new MemoryPersistence());
+            }
 
             MqttConnectOptions options = new MqttConnectOptions();
             options.setAutomaticReconnect(true);
