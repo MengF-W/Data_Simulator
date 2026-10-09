@@ -26,6 +26,7 @@ import org.opencv.video.Video;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -51,12 +52,17 @@ public class CameraController extends Application {
     @Autowired
     ObjectDetection objectDetection;
 
+    @Autowired
+    private Environment environment;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
 
         initProperties();
         streamCamera();
-        initPrimaryStage(primaryStage);
+
+        if(Boolean.parseBoolean(environment.getProperty("javafx.window.display")))
+            initPrimaryStage(primaryStage);
 
     }
 
