@@ -10,20 +10,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.zip.Deflater;
 
 @Component
 public class DeviceMessageProcessor implements MqttMessageProcessor{
 
-    private final String DATABASE_URL = "http://localhost:8080/db/createContent";
-
     private final String DEVICE_RECEIVE_TOPIC = "/device/receive";
+
+    private ReentrantLock reentrantLock;
 
     @Autowired
     IMqttClient iMqttClient;
 
     @Autowired
     CameraConfigurator cameraConfigurator;
+
+    @PostConstruct
+    public void postConstruct() {
+        reentrantLock = new ReentrantLock();
+    }
 
     @Override
     @Async
@@ -42,14 +52,43 @@ public class DeviceMessageProcessor implements MqttMessageProcessor{
     @Async
     public void publishObjectDetectedMessage(byte[] cameraImage) throws MqttException {
 
-        Camera camera = new Camera(cameraConfigurator.cameraSource,"camera","object detected", cameraImage, LocalDateTime.now());
-        MqttMessage message = new MqttMessage();
-        message.setQos(0);
-        message.setPayload(JsonParser.getInstance().serializeJson(camera).getBytes());
-        iMqttClient.publish(DEVICE_RECEIVE_TOPIC, message);
+        if(!reentrantLock.isLocked()){
+            reentrantLock.lock();
+            try {
 
-        System.out.println("Object is detected !");
-        System.out.println("Message "+ message +" is sent to '/device/receive'");
+                Camera camera = new Camera(cameraConfigurator.cameraSource,"camera","object detected", cameraImage, LocalDateTime.now());
+                MqttMessage message = new MqttMessage();
+                message.setQos(0);
+                message.setPayload(compressPayload(JsonParser.getInstance().serializeJson(camera).getBytes()));
+                iMqttClient.publish(DEVICE_RECEIVE_TOPIC, message);
 
+                System.out.println("Message is sent to '/device/receive'");
+                Thread.sleep(180000 );
+
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } catch (MqttException e){
+                e.printStackTrace();
+            }finally {
+                reentrantLock.unlock();
+            }
+        }
+    }
+
+    private byte[] compressPayload(byte[] payload){
+
+        Deflater deflater = new Deflater();
+        deflater.setInput(payload);
+        deflater.finish();
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+
+        while (!deflater.finished()) {
+            int compressedSize = deflater.deflate(buffer);
+            outputStream.write(buffer, 0, compressedSize);
+        }
+
+        return outputStream.toByteArray();
     }
 }
