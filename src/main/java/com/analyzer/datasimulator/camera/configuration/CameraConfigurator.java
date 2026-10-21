@@ -13,7 +13,7 @@ public class CameraConfigurator {
 
     private VideoCapture videoCapture;
 
-    @Value("")
+    @Value("${camera.source}")
     public String cameraSource;
 
     @Bean
@@ -31,6 +31,7 @@ public class CameraConfigurator {
         {
             videoCapture = new VideoCapture(cameraSource);
             System.out.println("Camera " + cameraSource + " is used");
+
         }
 
         return videoCapture;
