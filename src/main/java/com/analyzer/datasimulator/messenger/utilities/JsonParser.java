@@ -1,6 +1,9 @@
 package com.analyzer.datasimulator.messenger.utilities;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.time.LocalDateTime;
 
 public class JsonParser {
 
@@ -15,7 +18,9 @@ public class JsonParser {
         if(jsonParser == null){
 
             jsonParser = new JsonParser();
-            gSon = new Gson();
+            gSon = new GsonBuilder()
+                    .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                    .create();
         }
 
         return jsonParser;

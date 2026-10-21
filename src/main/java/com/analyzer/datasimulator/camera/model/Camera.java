@@ -4,19 +4,19 @@ package com.analyzer.datasimulator.camera.model;
 import java.time.LocalDateTime;
 
 public class Camera {
-    public Camera(String name, String deviceType, String messageContent, LocalDateTime timeStamp) {
+    public Camera(String name, String deviceType, String messageContent, byte[] mediaContent, LocalDateTime timeStamp) {
         this.name = name;
         this.deviceType = deviceType;
         this.messageContent = messageContent;
+        this.mediaContent = mediaContent;
         this.timeStamp = timeStamp;
     }
 
 
     private String name;
     private String deviceType;
-
     private String messageContent;
-
+    private byte[] mediaContent;
     private LocalDateTime timeStamp;
 
     public String getName() {
@@ -43,8 +43,11 @@ public class Camera {
         this.messageContent = messageContent;
     }
 
+    public byte[] getMediaContent() {return mediaContent;}
 
+    public void setMediaContent(byte[] mediaContent) {this.mediaContent = mediaContent;}
 
+    public LocalDateTime getTimeStamp() {return timeStamp;}
 
-
+    public void setTimeStamp(LocalDateTime timeStamp) {this.timeStamp = timeStamp;}
 }
