@@ -25,6 +25,9 @@ The data simulator application act as a message publisher simulator. Currently t
 # Docker Container Command
 `docker-compose up -d`      -To start the docker container from the docker image with the docker compose file configuration  
 
+# Setup Local Display of Containerized Java Fx Application
+Install [VcXsrv Windows X Server](https://sourceforge.net/projects/vcxsrv/) according the [reference](https://aboullaite.me/javafx-docker/) .
+
 # Sending Message
 ![image](https://github.com/user-attachments/assets/b0c00741-4164-4865-b40f-2e1b132a9d72) - Click the button from the player to trigger a message 
 
