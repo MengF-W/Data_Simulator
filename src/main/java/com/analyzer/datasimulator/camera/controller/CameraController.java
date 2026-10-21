@@ -1,50 +1,33 @@
 package com.analyzer.datasimulator.camera.controller;
 
+import com.analyzer.datasimulator.camera.configuration.CameraConfigurator;
 import com.analyzer.datasimulator.camera.utility.ObjectDetection;
 import com.analyzer.datasimulator.messenger.processor.DeviceMessageProcessor;
 import javafx.animation.AnimationTimer;
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
-import org.opencv.core.Core;
 import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG2;
 import org.opencv.video.Video;
 import org.opencv.videoio.VideoCapture;
-import org.opencv.videoio.Videoio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
 
 @Component
-public class CameraController extends Application {
+public class CameraController {
 
     @Autowired
     VideoCapture videoCapture;
-    private ImageView imageView;
-    private Button sendMessageButton;
-    private VBox vBox;
-    private Scene scene;
 
     @Autowired
     DeviceMessageProcessor deviceMessageProcessor;
@@ -55,92 +38,41 @@ public class CameraController extends Application {
     @Autowired
     private Environment environment;
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(){
 
-        initProperties();
         streamCamera();
 
-        if(Boolean.parseBoolean(environment.getProperty("javafx.window.display")))
-            initPrimaryStage(primaryStage);
-
     }
 
-    private void initProperties()
-    {
-        imageView = new ImageView();
-        sendMessageButton = new Button("Send Message");
-        initButtonAction(sendMessageButton);
-        vBox = new VBox();
-
-        vBox.getChildren().addAll(imageView, sendMessageButton);
-        vBox.setMargin(imageView, new Insets(20, 20, 20, 20));
-        vBox.setMargin(sendMessageButton, new Insets(20, 20, 20, 20));
-
-        scene = new Scene(vBox, videoCapture.get(Videoio.CAP_PROP_FRAME_WIDTH)+30, videoCapture.get(Videoio.CAP_PROP_FRAME_HEIGHT)+85);
-    }
-
-    private void streamCamera() throws MqttException{
+    private void streamCamera(){
 
         if (videoCapture.isOpened()){
 
             System.out.println("Camera is connected");
             BackgroundSubtractorMOG2 mog2 = Video.createBackgroundSubtractorMOG2(500,16,true);
-            new AnimationTimer() {
-                @Override public void handle(long l) {
-
-                    if(videoCapture.read(new Mat())) {
-
-                        Mat mat = new Mat();
-                        videoCapture.read(mat);
+            Mat mat = new Mat();
+            new Timer(1000, new ActionListener() {
+                public void actionPerformed(ActionEvent actionEvent) {
+                    if(videoCapture.read(mat)) {
 
                         try {
-                        Mat foreGroundMask = objectDetection.processFrame(mat,mog2);
-                        objectDetection.detectObject(foreGroundMask,mat);
+                            Mat foreGroundMask = objectDetection.processFrame(mat,mog2);
+                            objectDetection.detectObject(foreGroundMask,mat);
+                            mat.release();
                         } catch (MqttException e) {
                             System.out.println("Message cannot be sent. The exception is: " + e.getMessage());
                         }
-
-                        imageView.setImage(convertImgDimensionArrayToViewableImg(mat));
                     }
                     else
                     {
                         System.out.println("Camera is stopping to capture image");
+
                     }
                 }
-            }.start();
+            }).start();
+
         }
 
     }
-
-    private Image convertImgDimensionArrayToViewableImg(Mat mat) {
-        MatOfByte matOfByte = new MatOfByte();
-        Imgcodecs.imencode(".jpg", mat, matOfByte);
-        InputStream inputStream = new ByteArrayInputStream(matOfByte.toArray());
-        return new Image(inputStream);
-    }
-
-    private void initPrimaryStage(Stage primaryStage)
-    {
-        primaryStage.setTitle("Camera Player");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-
-        primaryStage.setOnCloseRequest((event -> {
-            System.exit(0);
-        }));
-    }
-
-    private void initButtonAction(Button sendMessageButton)
-    {
-        sendMessageButton.setOnAction((event -> {
-            try {
-                deviceMessageProcessor.publishMessage();
-            } catch (MqttException e) {
-                System.out.println("Message cannot be sent. The exception is: " + e.getMessage());
-            }
-        }));
-    }
-
 
 }
