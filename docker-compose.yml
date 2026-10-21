@@ -1,0 +1,11 @@
+
+services:
+  application:
+    container_name: data_simulator
+    image: data_simulator
+    restart: always
+    ports:
+      - "500:500"
+    environment:
+      - mqtt.ip=host.docker.internal
+      - DISPLAY=host.docker.internal:0.0
