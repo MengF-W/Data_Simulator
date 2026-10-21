@@ -43,8 +43,11 @@ public class Camera {
         this.messageContent = messageContent;
     }
 
+    public byte[] getMediaContent() {return mediaContent;}
 
+    public void setMediaContent(byte[] mediaContent) {this.mediaContent = mediaContent;}
 
+    public LocalDateTime getTimeStamp() {return timeStamp;}
 
-
+    public void setTimeStamp(LocalDateTime timeStamp) {this.timeStamp = timeStamp;}
 }
