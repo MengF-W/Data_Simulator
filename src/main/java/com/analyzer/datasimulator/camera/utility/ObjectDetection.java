@@ -10,15 +10,19 @@ import org.opencv.video.Video;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Component
 public class ObjectDetection {
 
     @Autowired
     DeviceMessageProcessor deviceMessageProcessor;
+
+
 
     public Mat processFrame(Mat videoFrame,BackgroundSubtractorMOG2 mog2){
 
@@ -76,16 +80,15 @@ public class ObjectDetection {
             {
                 for (Rect obj : rect_array) {
                     Imgproc.rectangle(videoFrame, obj.br(), obj.tl(),
-                            new Scalar(0, 255, 0), 2);
+                            new Scalar(0, 255, 0), 6);
                 }
+
+                MatOfByte matOfByte = new MatOfByte();
+                Imgcodecs.imencode(".jpg", videoFrame, matOfByte);
+                deviceMessageProcessor.publishObjectDetectedMessage(matOfByte.toArray());
+
             }
-
-            MatOfByte matOfByte = new MatOfByte();
-            Imgcodecs.imencode(".jpg", videoFrame, matOfByte);
-            deviceMessageProcessor.publishObjectDetectedMessage(matOfByte.toArray());
-
-
         }
-
+        hierarchey.release();
     }
 }
