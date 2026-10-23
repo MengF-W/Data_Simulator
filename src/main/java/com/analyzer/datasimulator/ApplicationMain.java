@@ -2,8 +2,11 @@ package com.analyzer.datasimulator;
 
 import com.analyzer.datasimulator.camera.controller.CameraController;
 import com.analyzer.datasimulator.camera.controller.CameraFxController;
+import com.analyzer.datasimulator.messenger.processor.DeviceMessageProcessor;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -19,6 +22,8 @@ public class ApplicationMain{
 
     public static void main(String[] args) {
 
+        Logger logger = LoggerFactory.getLogger(ApplicationMain.class);
+
         try {
             Properties prop = new Properties();
             prop.load(ApplicationMain.class.getClassLoader().getResourceAsStream("application.properties"));
@@ -31,8 +36,8 @@ public class ApplicationMain{
                 MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
                 long xmx = memoryBean.getHeapMemoryUsage().getMax() / mb;
                 long xms = memoryBean.getHeapMemoryUsage().getInit() / mb;
-                System.out.println("Initial Memory (xms) : "+xms+ "mb");
-                System.out.println("Max Memory (xmx) : "+xmx+"mb");
+                logger.info("Initial Memory (xms) : "+xms+ "mb");
+                logger.info("Max Memory (xmx) : "+xmx+"mb");
                 ConfigurableApplicationContext configurableApplicationContext = SpringApplication.run(ApplicationMain.class);
                 CameraController cameraController =(CameraController)configurableApplicationContext.getBean("cameraController");
                 cameraController.start();

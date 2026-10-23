@@ -4,12 +4,16 @@ import nu.pattern.OpenCV;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class CameraConfigurator {
+
+    Logger logger = LoggerFactory.getLogger(CameraConfigurator.class);
 
     private VideoCapture videoCapture;
 
@@ -23,14 +27,14 @@ public class CameraConfigurator {
         if(cameraSource == null || cameraSource.equals(""))
         {
             videoCapture = new VideoCapture(0);
-            System.out.println("Web Camera is used");
+            logger.info("Web Camera is used");
             cameraSource = "Web Camera";
 
         }
         else
         {
             videoCapture = new VideoCapture(cameraSource);
-            System.out.println("Camera " + cameraSource + " is used");
+            logger.info("Camera " + cameraSource + " is used");
 
         }
 
