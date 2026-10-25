@@ -59,10 +59,11 @@ public class MqttConfig {
             options.setCleanSession(true);
             options.setConnectionTimeout(10);
 
-            IMqttToken iMqttToken = iMqttClient.connectWithResult(options);
+
 
             if (!runningMode.equals("Testing"))
             {
+                IMqttToken iMqttToken = iMqttClient.connectWithResult(options);
                 if(iMqttToken != null && iMqttToken.getClient() != null && iMqttToken.getClient().isConnected())
                 {
                     System.out.println("MQTT is connected");
