@@ -13,6 +13,8 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.video.BackgroundSubtractorMOG2;
 import org.opencv.video.Video;
 import org.opencv.videoio.VideoCapture;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -25,6 +27,8 @@ import java.io.InputStream;
 
 @Component
 public class CameraController {
+
+    Logger logger = LoggerFactory.getLogger(CameraController.class);
 
     @Autowired
     VideoCapture videoCapture;
@@ -48,7 +52,7 @@ public class CameraController {
 
         if (videoCapture.isOpened()){
 
-            System.out.println("Camera is connected");
+            logger.info("Camera is connected");
             BackgroundSubtractorMOG2 mog2 = Video.createBackgroundSubtractorMOG2(500,16,true);
             Mat mat = new Mat();
             new Timer(1000, new ActionListener() {
@@ -60,12 +64,12 @@ public class CameraController {
                             objectDetection.detectObject(foreGroundMask,mat);
                             mat.release();
                         } catch (MqttException e) {
-                            System.out.println("Message cannot be sent. The exception is: " + e.getMessage());
+                            logger.debug("Message cannot be sent. The exception is: " + e.getMessage());
                         }
                     }
                     else
                     {
-                        System.out.println("Camera is stopping to capture image");
+                        logger.info("Camera is stopping to capture image");
 
                     }
                 }

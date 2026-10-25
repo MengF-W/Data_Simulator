@@ -19,6 +19,8 @@ import org.opencv.video.BackgroundSubtractorMOG2;
 import org.opencv.video.Video;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -28,6 +30,8 @@ import java.io.InputStream;
 
 @Component
 public class CameraFxController extends Application {
+
+    Logger logger = LoggerFactory.getLogger(CameraFxController.class);
 
     @Autowired
     VideoCapture videoCapture;
@@ -86,7 +90,7 @@ public class CameraFxController extends Application {
                         Mat foreGroundMask = objectDetection.processFrame(mat,mog2);
                         objectDetection.detectObject(foreGroundMask,mat);
                         } catch (MqttException e) {
-                            System.out.println("Message cannot be sent. The exception is: " + e.getMessage());
+                            logger.debug("Message cannot be sent. The exception is: " + e.getMessage());
                         }
 
                         imageView.setImage(convertImgDimensionArrayToViewableImg(mat));
@@ -94,7 +98,7 @@ public class CameraFxController extends Application {
                     }
                     else
                     {
-                        System.out.println("Camera is stopping to capture image");
+                        logger.info("Camera is stopping to capture image");
                     }
                 }
             }.start();

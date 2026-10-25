@@ -1,9 +1,12 @@
 package com.analyzer.datasimulator.messenger.configuration;
 
 
+import com.analyzer.datasimulator.camera.configuration.CameraConfigurator;
 import com.analyzer.datasimulator.messenger.processor.DeviceMessageProcessor;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +21,8 @@ import java.util.UUID;
 @Configuration
 @ComponentScan(basePackages = "com.analyzer.datasimulator")
 public class MqttConfig {
+
+    Logger logger = LoggerFactory.getLogger(MqttConfig.class);
 
     private final String DEVICE_RECEIVE_TOPIC = "/device/receive";
 
@@ -66,7 +71,7 @@ public class MqttConfig {
                 IMqttToken iMqttToken = iMqttClient.connectWithResult(options);
                 if(iMqttToken != null && iMqttToken.getClient() != null && iMqttToken.getClient().isConnected())
                 {
-                    System.out.println("MQTT is connected");
+                    logger.info("MQTT is connected");
 
                 }
                 else
@@ -79,29 +84,19 @@ public class MqttConfig {
 
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
 
-                    System.out.println("Message Arrived" );
-                    System.out.println("Topic: " + topic );
-                    System.out.println("Message: " + new String(message.getPayload()));
-                    System.out.println("QoS: " + message.getQos());
+                    logger.info("Message Arrived" );
+                    logger.info("Topic: " + topic );
+                    logger.info("Message: " + new String(message.getPayload()));
+                    logger.info("QoS: " + message.getQos());
 
                 }
 
                 public void connectionLost(Throwable cause) {
 
-                    System.out.println("MQTT connection is disconnected. " + cause.getMessage());
-                    System.out.println("MQTT is reconnecting. " + cause.getMessage());
+                    logger.debug("MQTT connection is disconnected. " + cause.getMessage());
+                    logger.debug("MQTT is reconnecting. ");
                     initConnection();
-                    try {
 
-                        while(!iMqttClient.connectWithResult(options).getClient().isConnected())
-                        {
-                            initConnection();
-                        }
-
-                    }catch (MqttException e) {
-
-                        connectionLost(e);
-                    }
                 }
 
                 public void deliveryComplete(IMqttDeliveryToken token) {
@@ -110,7 +105,7 @@ public class MqttConfig {
             });
 
         } catch (MqttException e) {
-            e.printStackTrace();
+            logger.debug("MQTT is not connected. " + e.getMessage());
             initMqttClient();
         }
 

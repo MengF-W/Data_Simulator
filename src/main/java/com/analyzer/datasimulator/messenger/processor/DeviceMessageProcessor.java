@@ -2,10 +2,13 @@ package com.analyzer.datasimulator.messenger.processor;
 
 import com.analyzer.datasimulator.camera.configuration.CameraConfigurator;
 import com.analyzer.datasimulator.camera.model.Camera;
+import com.analyzer.datasimulator.messenger.configuration.MqttConfig;
 import com.analyzer.datasimulator.messenger.utilities.JsonParser;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -19,6 +22,8 @@ import java.util.zip.Deflater;
 
 @Component
 public class DeviceMessageProcessor implements MqttMessageProcessor{
+
+    Logger logger = LoggerFactory.getLogger(DeviceMessageProcessor.class);
 
     private final String DEVICE_RECEIVE_TOPIC = "/device/receive";
 
@@ -44,7 +49,7 @@ public class DeviceMessageProcessor implements MqttMessageProcessor{
         message.setPayload(JsonParser.getInstance().serializeJson(camera).getBytes());
         iMqttClient.publish(DEVICE_RECEIVE_TOPIC, message);
 
-        System.out.println("Message "+ message +" is sent to '/device/receive'");
+        logger.info("Message "+ message +" is sent to '/device/receive'");
 
     }
 
@@ -62,13 +67,13 @@ public class DeviceMessageProcessor implements MqttMessageProcessor{
                 message.setPayload(compressPayload(JsonParser.getInstance().serializeJson(camera).getBytes()));
                 iMqttClient.publish(DEVICE_RECEIVE_TOPIC, message);
 
-                System.out.println("Message is sent to '/device/receive'");
+                logger.info("Message is sent to '/device/receive'");
                 Thread.sleep(180000 );
 
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             } catch (MqttException e){
-                e.printStackTrace();
+                logger.debug("Message failed to be sent: ", e.getMessage());
             }finally {
                 reentrantLock.unlock();
             }
