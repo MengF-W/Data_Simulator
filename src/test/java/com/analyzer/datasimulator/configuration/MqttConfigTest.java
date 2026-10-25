@@ -4,6 +4,7 @@ import com.analyzer.datasimulator.camera.configuration.CameraConfigurator;
 import com.analyzer.datasimulator.camera.controller.CameraController;
 import com.analyzer.datasimulator.camera.controller.CameraFxController;
 import com.analyzer.datasimulator.messenger.configuration.MqttConfig;
+import com.analyzer.datasimulator.messenger.processor.DeviceMessageProcessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = MqttConfig.class)
 @TestPropertySource(properties = {"running.mode=Testing"})
-@MockBeans({@MockBean(CameraController.class),@MockBean(CameraFxController.class),@MockBean(CameraConfigurator.class)})
+@MockBeans({@MockBean(CameraController.class),@MockBean(CameraFxController.class),@MockBean(CameraConfigurator.class),@MockBean(DeviceMessageProcessor.class)})
 @EnableAutoConfiguration(exclude= {DataSourceAutoConfiguration.class,})
 public class MqttConfigTest {
 
