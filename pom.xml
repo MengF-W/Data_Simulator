@@ -68,7 +68,6 @@
             <artifactId>javafx</artifactId>
             <version>11</version>
             <type>pom</type>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
